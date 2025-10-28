@@ -187,13 +187,3 @@ export async function cancelarConta(req, res) {
     return res.status(500).json({ erro: "Erro interno" });
   }
 }
-
-// 👇 exportações nomeadas (ESSENCIAL)
-export {
-  cadastrarUsuario,
-  loginUsuario,
-  verificarUsuario,
-  atualizarUsuario,
-  logout,
-  cancelarConta,
-};
