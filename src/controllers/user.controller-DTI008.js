@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { supabase } from "../supabaseClient.js";
-import { gerarToken, verificarTokenDoCookie } from "../../middlewares/auth.js";
+import { autenticar } from "../middlewares/auth.js";
 
 const COOKIE_NAME = process.env.COOKIE_NAME || "emilyloja_token";
 const IS_PROD = process.env.NODE_ENV === "production";
