@@ -1,31 +1,33 @@
-// src/auth.js
+// src/middlewares/auth.js
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import cookie from "cookie";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "segredo_temporario";
 const COOKIE_NAME = process.env.COOKIE_NAME || "emilyloja_token";
 
-export function gerarToken(payload) {
-  // expire em 7 dias por exemplo
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
-}
-
+// 🔐 Verifica o token do cookie
 export function verificarTokenDoCookie(req) {
-  const token = req.cookies?.[COOKIE_NAME] || null;
-  if (!token) return null;
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    return decoded;
+    const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {};
+    const token = cookies[COOKIE_NAME];
+    if (!token) return null;
+
+    return jwt.verify(token, JWT_SECRET);
   } catch (err) {
+    console.error("Erro ao verificar token:", err.message);
     return null;
   }
 }
 
-// middleware express
-export function requireAuth(req, res, next) {
+// ✅ Middleware de autenticação
+export function autenticar(req, res, next) {
   const decoded = verificarTokenDoCookie(req);
   if (!decoded) return res.status(401).json({ erro: "Não autenticado" });
-  req.user = decoded; // { id, email, nome } conforme gerarmos
+  req.usuario = decoded;
   next();
+}
+
+// 🧾 Gera novo token JWT
+export function gerarToken(dados) {
+  return jwt.sign(dados, JWT_SECRET, { expiresIn: "7d" });
 }
