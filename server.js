@@ -8,21 +8,26 @@ import { userRouter } from "./src/routes/user.route.js";
 dotenv.config();
 const app = express();
 
+// 🟢 FRONTEND hospedado no Netlify
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://lojatetse.netlify.app";
+
 app.use(cors({
-  origin: true, // ou sua URL do front, ex: "https://sua-front.netlify.app"
-  credentials: true
+  origin: FRONTEND_URL, // libera apenas o seu site
+  credentials: true // necessário para enviar cookies
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
-// Rota simples
-app.get("/", (req, res) => res.send("🚀 API da EmilyLoja está online!"));
+// ✅ Rota simples para teste
+app.get("/", (req, res) => res.send("🚀 API da EmilyLoja está online e conectada!"));
 
-// Rotas de usuário
+// ✅ Rotas de usuário
 app.use("/api", userRouter);
 
-// Health
+// ✅ Health check
 app.get("/health", (req, res) => res.json({ ok: true }));
 
+// ✅ Inicializa servidor
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));

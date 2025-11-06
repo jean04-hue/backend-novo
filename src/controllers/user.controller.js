@@ -5,20 +5,19 @@ import { gerarToken, verificarTokenDoCookie } from "../middlewares/auth.js";
 const COOKIE_NAME = process.env.COOKIE_NAME || "emilyloja_token";
 const IS_PROD = process.env.NODE_ENV === "production";
 
-// POST /api/cadastrar
+// ✅ POST /api/cadastrar
 export async function cadastrarUsuario(req, res) {
   try {
     const { nome, email, senha } = req.body;
     if (!nome || !email || !senha)
       return res.status(400).json({ erro: "Preencha todos os campos" });
 
-    const { data: exists, error: errExists } = await supabase
+    const { data: exists } = await supabase
       .from("usuarios")
       .select("id")
       .eq("email", email.toLowerCase())
       .limit(1);
 
-    if (errExists) return res.status(500).json({ erro: "Erro ao verificar usuário" });
     if (exists && exists.length > 0)
       return res.status(400).json({ erro: "E-mail já cadastrado" });
 
@@ -47,20 +46,19 @@ export async function cadastrarUsuario(req, res) {
   }
 }
 
-// POST /api/login
+// ✅ POST /api/login
 export async function loginUsuario(req, res) {
   try {
     const { email, senha } = req.body;
     if (!email || !senha)
       return res.status(400).json({ erro: "Preencha e-mail e senha" });
 
-    const { data: rows, error } = await supabase
+    const { data: rows } = await supabase
       .from("usuarios")
       .select("id, nome, email, senha")
       .eq("email", email.toLowerCase())
       .limit(1);
 
-    if (error) return res.status(500).json({ erro: "Erro ao buscar usuário" });
     const usuario = rows && rows[0];
     if (!usuario) return res.status(401).json({ erro: "Usuário não encontrado." });
 
@@ -84,19 +82,18 @@ export async function loginUsuario(req, res) {
   }
 }
 
-// GET /api/verificar-usuario
+// ✅ GET /api/verificar-usuario
 export async function verificarUsuario(req, res) {
   try {
     const decoded = verificarTokenDoCookie(req);
     if (!decoded) return res.status(401).json({ erro: "Não autenticado" });
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("usuarios")
       .select("id, nome, email, telefone, endereco, criado_em")
       .eq("id", decoded.id)
       .limit(1);
 
-    if (error) return res.status(500).json({ erro: "Erro ao buscar usuário" });
     if (!data || data.length === 0)
       return res.status(404).json({ erro: "Usuário não encontrado" });
 
@@ -107,7 +104,7 @@ export async function verificarUsuario(req, res) {
   }
 }
 
-// PUT /api/atualizar-usuario
+// ✅ PUT /api/atualizar-usuario
 export async function atualizarUsuario(req, res) {
   try {
     const decoded = verificarTokenDoCookie(req);
@@ -130,9 +127,8 @@ export async function atualizarUsuario(req, res) {
         .select("id")
         .eq("email", payload.email.toLowerCase())
         .limit(1);
-      if (exists && exists.length > 0 && exists[0].id !== decoded.id) {
+      if (exists && exists.length > 0 && exists[0].id !== decoded.id)
         return res.status(400).json({ erro: "E-mail já em uso" });
-      }
       payload.email = payload.email.toLowerCase();
     }
 
@@ -152,7 +148,7 @@ export async function atualizarUsuario(req, res) {
   }
 }
 
-// POST /api/logout
+// ✅ POST /api/logout
 export async function logout(req, res) {
   try {
     res.clearCookie(COOKIE_NAME, {
@@ -167,7 +163,7 @@ export async function logout(req, res) {
   }
 }
 
-// DELETE /api/cancelar-conta
+// ✅ DELETE /api/cancelar-conta
 export async function cancelarConta(req, res) {
   try {
     const decoded = verificarTokenDoCookie(req);
