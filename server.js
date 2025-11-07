@@ -1,20 +1,25 @@
-// server.js
 import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
-import { userRouter } from "./src/routes/user.route.js";
 
-dotenv.config();
 const app = express();
 
-// 🟢 FRONTEND hospedado no Netlify
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://lojatetse.netlify.app";
+const allowedOrigins = [
+  "https://lojatetse.netlify.app", // produção
+  "http://127.0.0.1:5501",        // testes locais
+  "http://localhost:5501"          // alternativa local
+];
 
-app.use(cors({
-  origin: FRONTEND_URL, // libera apenas o seu site
-  credentials: true // necessário para enviar cookies
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Permite requisições sem "origin" (como do Postman ou ApiDog)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("CORS bloqueado para: " + origin));
+    },
+    credentials: true, // necessário para cookies
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser());
