@@ -1,4 +1,3 @@
-// server.js
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -6,23 +5,58 @@ import dotenv from "dotenv";
 import { userRouter } from "./src/routes/user.route.js";
 
 dotenv.config();
+
 const app = express();
 
-app.use(cors({
-  origin: true, // ou sua URL do front, ex: "https://sua-front.netlify.app"
-  credentials: true
-}));
+const allowedOrigins = [
+  "https://lojatetse.netlify.app",
+  "http://127.0.0.1:5500",
+  "http://localhost:5500",
+];
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Origem não permitida pelo CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
 
-// Rota simples
-app.get("/", (req, res) => res.send("🚀 API da EmilyLoja está online!"));
+app.get("/", (req, res) => {
+  res.send("🚀 API da EmilyLoja está online!");
+});
 
-// Rotas de usuário
+app.get("/health", (req, res) => {
+  res.json({
+    ok: true,
+    app: "EmilyLoja API",
+    env: process.env.NODE_ENV || "development",
+  });
+});
+
 app.use("/api", userRouter);
 
-// Health
-app.get("/health", (req, res) => res.json({ ok: true }));
+// middleware final de erro
+app.use((err, req, res, next) => {
+  console.error("Erro global:", err);
+
+  if (err.message === "Origem não permitida pelo CORS") {
+    return res.status(403).json({ erro: "Origem não permitida" });
+  }
+
+  return res.status(500).json({ erro: "Erro interno do servidor" });
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});
