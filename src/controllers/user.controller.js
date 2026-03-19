@@ -5,9 +5,6 @@ import { gerarToken, verificarTokenDoCookie } from "../middlewares/auth.js";
 const COOKIE_NAME = process.env.COOKIE_NAME || "emilyloja_token";
 const IS_PROD = process.env.NODE_ENV === "production";
 
-<<<<<<< HEAD
-// Para Netlify(front) -> Render(back) com credentials/include,
-// o cookie precisa ser SameSite=None + Secure em produção.
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: IS_PROD,
@@ -24,21 +21,17 @@ function validarEmail(email) {
 }
 
 function respostaErroSupabase(res, contexto, error) {
-  console.error(`Erro ${contexto}:`, error);
+  console.error(`Erro ao ${contexto}:`, error);
   return res.status(500).json({ erro: `Erro ao ${contexto}` });
 }
 
 // POST /api/cadastrar
-=======
-// ✅ POST /api/cadastrar
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
 export async function cadastrarUsuario(req, res) {
   try {
     const nome = String(req.body?.nome || "").trim();
     const email = normalizarEmail(req.body?.email);
     const senha = String(req.body?.senha || "");
 
-<<<<<<< HEAD
     if (!nome || !email || !senha) {
       return res.status(400).json({ erro: "Preencha todos os campos" });
     }
@@ -52,23 +45,16 @@ export async function cadastrarUsuario(req, res) {
     }
 
     const { data: existeUsuario, error: erroBusca } = await supabase
-=======
-    const { data: exists } = await supabase
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
       .from("usuarios")
       .select("id")
       .eq("email", email)
       .limit(1);
 
-<<<<<<< HEAD
     if (erroBusca) {
       return respostaErroSupabase(res, "verificar usuário", erroBusca);
     }
 
     if (existeUsuario && existeUsuario.length > 0) {
-=======
-    if (exists && exists.length > 0)
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
       return res.status(400).json({ erro: "E-mail já cadastrado" });
     }
 
@@ -108,27 +94,22 @@ export async function cadastrarUsuario(req, res) {
   }
 }
 
-// ✅ POST /api/login
+// POST /api/login
 export async function loginUsuario(req, res) {
   try {
     const email = normalizarEmail(req.body?.email);
     const senha = String(req.body?.senha || "");
 
-<<<<<<< HEAD
     if (!email || !senha) {
       return res.status(400).json({ erro: "Preencha e-mail e senha" });
     }
 
     const { data: usuarios, error } = await supabase
-=======
-    const { data: rows } = await supabase
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
       .from("usuarios")
       .select("id, nome, email, senha, telefone, endereco")
       .eq("email", email)
       .limit(1);
 
-<<<<<<< HEAD
     if (error) {
       return respostaErroSupabase(res, "buscar usuário", error);
     }
@@ -138,10 +119,6 @@ export async function loginUsuario(req, res) {
     if (!usuario) {
       return res.status(401).json({ erro: "Usuário não encontrado." });
     }
-=======
-    const usuario = rows && rows[0];
-    if (!usuario) return res.status(401).json({ erro: "Usuário não encontrado." });
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
 
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
 
@@ -173,33 +150,24 @@ export async function loginUsuario(req, res) {
   }
 }
 
-// ✅ GET /api/verificar-usuario
+// GET /api/verificar-usuario
 export async function verificarUsuario(req, res) {
   try {
     const decoded = verificarTokenDoCookie(req);
 
-<<<<<<< HEAD
     if (!decoded) {
       return res.status(401).json({ erro: "Não autenticado" });
     }
 
     const { data: usuarios, error } = await supabase
-=======
-    const { data } = await supabase
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
       .from("usuarios")
       .select("id, nome, email, telefone, endereco, criado_em")
       .eq("id", decoded.id)
       .limit(1);
 
-<<<<<<< HEAD
     if (error) {
       return respostaErroSupabase(res, "buscar usuário", error);
     }
-=======
-    if (!data || data.length === 0)
-      return res.status(404).json({ erro: "Usuário não encontrado" });
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
 
     const usuario = usuarios?.[0];
 
@@ -214,7 +182,7 @@ export async function verificarUsuario(req, res) {
   }
 }
 
-// ✅ PUT /api/atualizar-usuario
+// PUT /api/atualizar-usuario
 export async function atualizarUsuario(req, res) {
   try {
     const decoded = verificarTokenDoCookie(req);
@@ -267,7 +235,6 @@ export async function atualizarUsuario(req, res) {
         .select("id")
         .eq("email", payload.email)
         .limit(1);
-<<<<<<< HEAD
 
       if (erroEmail) {
         return respostaErroSupabase(res, "verificar e-mail", erroEmail);
@@ -276,11 +243,6 @@ export async function atualizarUsuario(req, res) {
       if (existeEmail && existeEmail.length > 0 && existeEmail[0].id !== decoded.id) {
         return res.status(400).json({ erro: "E-mail já em uso" });
       }
-=======
-      if (exists && exists.length > 0 && exists[0].id !== decoded.id)
-        return res.status(400).json({ erro: "E-mail já em uso" });
-      payload.email = payload.email.toLowerCase();
->>>>>>> 14b33b5911260b482c8506dd8e46796402f08f96
     }
 
     const { data, error } = await supabase
@@ -312,7 +274,7 @@ export async function atualizarUsuario(req, res) {
   }
 }
 
-// ✅ POST /api/logout
+// POST /api/logout
 export async function logout(req, res) {
   try {
     res.clearCookie(COOKIE_NAME, {
@@ -328,7 +290,7 @@ export async function logout(req, res) {
   }
 }
 
-// ✅ DELETE /api/cancelar-conta
+// DELETE /api/cancelar-conta
 export async function cancelarConta(req, res) {
   try {
     const decoded = verificarTokenDoCookie(req);
