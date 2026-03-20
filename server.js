@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { userRouter } from "./src/routes/user.route.js";
+import { productRouter } from "./src/routes/product.route.js";
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/api", userRouter);
+app.use("/api", productRouter);
 
 app.use((err, req, res, next) => {
   console.error("Erro global:", err);
@@ -55,7 +57,8 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ erro: "Erro interno do servidor" });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
