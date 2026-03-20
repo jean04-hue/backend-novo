@@ -47,31 +47,52 @@ export async function buscarProdutoPorId(req, res) {
 // POST /api/produtos
 export async function criarProduto(req, res) {
   try {
-    const {
-      nome,
-      descricao,
-      preco,
-      categoria,
-      imagem_url,
-      estoque,
-      ativo
-    } = req.body;
+    const nome = String(req.body?.nome || "").trim();
+    const descricao = String(req.body?.descricao || "").trim();
+    const preco = req.body?.preco;
+    const categoria = String(req.body?.categoria || "").trim();
+    const imagem_url = String(req.body?.imagem_url || "").trim();
+    const estoque = req.body?.estoque;
+    const ativo = req.body?.ativo !== undefined ? Boolean(req.body.ativo) : true;
 
-    if (!nome || !categoria || preco === undefined || estoque === undefined) {
-      return res.status(400).json({ erro: "Preencha os campos obrigatórios" });
+    if (!nome) {
+      return res.status(400).json({ erro: "Campo obrigatório: nome" });
+    }
+
+    if (!categoria) {
+      return res.status(400).json({ erro: "Campo obrigatório: categoria" });
+    }
+
+    if (preco === undefined || preco === null || preco === "") {
+      return res.status(400).json({ erro: "Campo obrigatório: preco" });
+    }
+
+    if (estoque === undefined || estoque === null || estoque === "") {
+      return res.status(400).json({ erro: "Campo obrigatório: estoque" });
+    }
+
+    const precoNumero = Number(preco);
+    const estoqueNumero = Number(estoque);
+
+    if (Number.isNaN(precoNumero)) {
+      return res.status(400).json({ erro: "Preço inválido" });
+    }
+
+    if (Number.isNaN(estoqueNumero)) {
+      return res.status(400).json({ erro: "Estoque inválido" });
     }
 
     const { data, error } = await supabase
       .from("produtos")
       .insert([
         {
-          nome: String(nome).trim(),
-          descricao: descricao ? String(descricao).trim() : "",
-          preco: Number(preco),
-          categoria: String(categoria).trim(),
-          imagem_url: imagem_url ? String(imagem_url).trim() : "",
-          estoque: Number(estoque),
-          ativo: ativo !== undefined ? Boolean(ativo) : true,
+          nome,
+          descricao,
+          preco: precoNumero,
+          categoria,
+          imagem_url,
+          estoque: estoqueNumero,
+          ativo,
         },
       ])
       .select("*")
@@ -96,7 +117,6 @@ export async function criarProduto(req, res) {
 export async function atualizarProduto(req, res) {
   try {
     const { id } = req.params;
-
     const payload = {};
 
     if (req.body.nome !== undefined) payload.nome = String(req.body.nome).trim();
