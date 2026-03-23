@@ -51,6 +51,7 @@ export async function criarProduto(req, res) {
     const descricao = String(req.body?.descricao || "").trim();
     const preco = req.body?.preco;
     const categoria = String(req.body?.categoria || "").trim();
+    const publico = String(req.body?.publico || "").trim().toLowerCase();
     const imagem_url = String(req.body?.imagem_url || "").trim();
     const estoque = req.body?.estoque;
     const ativo = req.body?.ativo !== undefined ? Boolean(req.body.ativo) : true;
@@ -61,6 +62,14 @@ export async function criarProduto(req, res) {
 
     if (!categoria) {
       return res.status(400).json({ erro: "Campo obrigatório: categoria" });
+    }
+
+    if (!publico) {
+      return res.status(400).json({ erro: "Campo obrigatório: publico" });
+    }
+
+    if (!["masculino", "feminino"].includes(publico)) {
+      return res.status(400).json({ erro: "Público inválido" });
     }
 
     if (preco === undefined || preco === null || preco === "") {
@@ -90,6 +99,7 @@ export async function criarProduto(req, res) {
           descricao,
           preco: precoNumero,
           categoria,
+          publico,
           imagem_url,
           estoque: estoqueNumero,
           ativo,
@@ -123,6 +133,7 @@ export async function atualizarProduto(req, res) {
     if (req.body.descricao !== undefined) payload.descricao = String(req.body.descricao).trim();
     if (req.body.preco !== undefined) payload.preco = Number(req.body.preco);
     if (req.body.categoria !== undefined) payload.categoria = String(req.body.categoria).trim();
+    if (req.body.publico !== undefined) payload.publico = String(req.body.publico).trim().toLowerCase();
     if (req.body.imagem_url !== undefined) payload.imagem_url = String(req.body.imagem_url).trim();
     if (req.body.estoque !== undefined) payload.estoque = Number(req.body.estoque);
     if (req.body.ativo !== undefined) payload.ativo = Boolean(req.body.ativo);
