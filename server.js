@@ -11,14 +11,13 @@ dotenv.config();
 
 const app = express();
 
-// 🔥 ORIGENS PERMITIDAS
 const allowedOrigins = [
   "https://lojatetse.netlify.app",
   "http://127.0.0.1:5500",
   "http://localhost:5500",
 ];
 
-// 🔥 CORS CORRIGIDO (AQUI ESTÁ A SOLUÇÃO DO SEU ERRO)
+// ✅ CORS CORRIGIDO
 app.use(
   cors({
     origin(origin, callback) {
@@ -29,15 +28,23 @@ app.use(
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "user-id"], // 🔥 AQUI FOI CORRIGIDO
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "user-id", // ✅ AQUI ESTÁ A CORREÇÃO PRINCIPAL
+    ],
   })
 );
 
-// 🔥 Middlewares
 app.use(express.json());
 app.use(cookieParser());
 
-// 🔥 Rotas básicas
+// ROTAS
+app.use("/api", userRouter);
+app.use("/api", productRouter);
+app.use("/api/carrinho", cartRoutes);
+
+// TESTE
 app.get("/", (req, res) => {
   res.send("🚀 API da EmilyLoja está online!");
 });
@@ -50,12 +57,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// 🔥 ROTAS PRINCIPAIS
-app.use("/api", userRouter);
-app.use("/api", productRouter);
-app.use("/api/carrinho", cartRoutes); // 🔥 AGORA NO LUGAR CERTO
-
-// 🔥 Tratamento de erros
+// ERRO GLOBAL
 app.use((err, req, res, next) => {
   console.error("Erro global:", err);
 
@@ -66,7 +68,6 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ erro: "Erro interno do servidor" });
 });
 
-// 🔥 Porta
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, "0.0.0.0", () => {
