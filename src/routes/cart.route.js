@@ -7,8 +7,13 @@ import {
 
 const router = express.Router();
 
+// LISTAR ITENS DO CARRINHO
 router.get("/", listarCarrinho);
+
+// ADICIONAR ITEM
 router.post("/", adicionarCarrinho);
+
+// REMOVER ITEM
 router.delete("/:id", removerCarrinho);
 
 export default router;
