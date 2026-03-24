@@ -4,6 +4,9 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { userRouter } from "./src/routes/user.route.js";
 import { productRouter } from "./src/routes/product.route.js";
+import cartRoutes from "./src/routes/cart.route.js";
+
+app.use("/api/carrinho", cartRoutes);
 
 dotenv.config();
 
