@@ -25,9 +25,8 @@
   "devDependencies": {
     "nodemon": "^3.1.10",
     "prisma": "^5.0.0"
+  },
+  "prisma": {
+    "schema": "./back/prisma/schema.prisma"
   }
-"prisma": {
-  "schema": "./back/prisma/schema.prisma"
-}
-
 }
