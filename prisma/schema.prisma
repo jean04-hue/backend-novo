@@ -8,30 +8,31 @@ datasource db {
 }
 
 model usuarios {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   nome      String
-  email     String   @unique
+  email     String     @unique
   senha     String
-  criado_em DateTime @default(now())
+
+  carrinhos carrinho[]   // 🔥 RELAÇÃO INVERSA
 }
 
 model produtos {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   nome        String
-  descricao   String
   preco       Float
-  imagem_url  String
-  categoria   String
-  publico     String
+  imagem_url  String?
+  categoria   String?
   estoque     Int
-  criado_em   DateTime @default(now())
+
+  carrinhos   carrinho[] // 🔥 RELAÇÃO INVERSA
 }
 
 model carrinho {
-  id          Int      @id @default(autoincrement())
+  id          Int @id @default(autoincrement())
+
   usuario_id  Int
   produto_id  Int
-  quantidade  Int      @default(1)
+  quantidade  Int @default(1)
 
   usuarios    usuarios @relation(fields: [usuario_id], references: [id])
   produtos    produtos @relation(fields: [produto_id], references: [id])
