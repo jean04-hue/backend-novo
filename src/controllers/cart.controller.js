@@ -31,21 +31,29 @@ export const listarCarrinho = async (req, res) => {
 export const adicionarCarrinho = async (req, res) => {
   try {
     const usuario_id = Number(req.headers["user-id"]);
-    const produto_id = req.body.produto_id; // ✅ NÃO CONVERTE PRA NUMBER
+    const produto_id = req.body.produto_id; // ✅ STRING (UUID)
 
     if (!usuario_id || !produto_id) {
       return res.status(400).json({ erro: "Dados inválidos" });
     }
 
-    // 🔍 PROCURA ITEM EXISTENTE
+    // 🔍 verifica se produto existe
+    const produtoExiste = await prisma.produtos.findUnique({
+      where: { id: produto_id }
+    });
+
+    if (!produtoExiste) {
+      return res.status(404).json({ erro: "Produto não encontrado" });
+    }
+
+    // 🔍 verifica se já está no carrinho
     const itemExistente = await prisma.carrinho.findFirst({
       where: {
         usuario_id,
-        produto_id // ✅ STRING (UUID)
+        produto_id
       }
     });
 
-    // 🔁 SE JÁ EXISTE → SOMA QUANTIDADE
     if (itemExistente) {
       const atualizado = await prisma.carrinho.update({
         where: { id: itemExistente.id },
@@ -57,11 +65,11 @@ export const adicionarCarrinho = async (req, res) => {
       return res.json(atualizado);
     }
 
-    // 🆕 NOVO ITEM
+    // 🆕 cria novo item
     const novoItem = await prisma.carrinho.create({
       data: {
         usuario_id,
-        produto_id, // ✅ STRING
+        produto_id,
         quantidade: 1
       }
     });
