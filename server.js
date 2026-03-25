@@ -68,8 +68,8 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ erro: "Erro interno do servidor" });
 });
 
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
