@@ -11,7 +11,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^5.22.0",
     "@supabase/supabase-js": "^2.76.1",
     "bcryptjs": "^3.0.2",
     "cookie": "^1.0.2",
@@ -24,6 +24,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "prisma": "^5.0.0"
+    "prisma": "^5.22.0"
   }
 }

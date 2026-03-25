@@ -8,30 +8,30 @@ datasource db {
 }
 
 model usuarios {
-  id        Int        @id @default(autoincrement())
+  id        String   @id @default(uuid())
   nome      String
-  email     String     @unique
+  email     String   @unique
   senha     String
 
-  carrinhos carrinho[]   // 🔥 RELAÇÃO INVERSA
+  carrinhos carrinho[]
 }
 
 model produtos {
-  id          Int        @id @default(autoincrement())
+  id          String   @id @default(uuid())
   nome        String
   preco       Float
   imagem_url  String?
   categoria   String?
   estoque     Int
 
-  carrinhos   carrinho[] // 🔥 RELAÇÃO INVERSA
+  carrinhos   carrinho[]
 }
 
 model carrinho {
-  id          Int @id @default(autoincrement())
+  id          String   @id @default(uuid())
 
-  usuario_id  Int
-  produto_id  Int
+  usuario_id  String
+  produto_id  String
   quantidade  Int @default(1)
 
   usuarios    usuarios @relation(fields: [usuario_id], references: [id])
