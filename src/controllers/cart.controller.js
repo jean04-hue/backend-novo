@@ -31,11 +31,28 @@ export const listarCarrinho = async (req, res) => {
 export const adicionarCarrinho = async (req, res) => {
   try {
     const usuario_id = req.headers["user-id"];
-    const { produto_id, quantidade, tamanho, cor } = req.body;
+    let { produto_id, quantidade, tamanho, cor } = req.body;
 
+    // 🔥 VALIDAÇÃO FORTE
     if (!usuario_id || !produto_id) {
       return res.status(400).json({ erro: "Dados inválidos" });
     }
+
+    // 🔥 GARANTE QUE QUANTIDADE É NÚMERO
+    quantidade = Number(quantidade) || 1;
+
+    // 🔥 PADRÕES (evita null quebrando banco)
+    tamanho = tamanho || "único";
+    cor = cor || "única";
+
+    // 🔥 DEBUG (IMPORTANTE PRA TESTE)
+    console.log("🛒 ADD CARRINHO:", {
+      usuario_id,
+      produto_id,
+      quantidade,
+      tamanho,
+      cor
+    });
 
     const itemExistente = await prisma.carrinho.findFirst({
       where: {
@@ -70,7 +87,7 @@ export const adicionarCarrinho = async (req, res) => {
     res.json(novoItem);
 
   } catch (error) {
-    console.error(error);
+    console.error("🔥 ERRO REAL:", error); // 🔥 MOSTRA ERRO VERDADEIRO
     res.status(500).json({ erro: "Erro ao adicionar ao carrinho" });
   }
 };
