@@ -22,17 +22,27 @@ model produtos {
   preco       Float
   imagem_url  String?
   categoria   String?
+
+  // 🔥 NOVO
+  tamanhos    String[] // ["P", "M", "G"] ou ["Único"]
+  cores       String[] // ["Preto", "Branco"]
+
   estoque     Int
 
   carrinhos   carrinho[]
 }
 
 model carrinho {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
 
   usuario_id  String
   produto_id  String
+
   quantidade  Int @default(1)
+
+  // 🔥 NOVO
+  tamanho     String?
+  cor         String?
 
   usuarios    usuarios @relation(fields: [usuario_id], references: [id])
   produtos    produtos @relation(fields: [produto_id], references: [id])

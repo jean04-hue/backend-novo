@@ -30,8 +30,8 @@ export const listarCarrinho = async (req, res) => {
 // =============================
 export const adicionarCarrinho = async (req, res) => {
   try {
-    const usuario_id = req.headers["user-id"]; // ✅ STRING
-    const produto_id = req.body.produto_id;     // ✅ STRING
+    const usuario_id = req.headers["user-id"];
+    const { produto_id, quantidade, tamanho, cor } = req.body;
 
     if (!usuario_id || !produto_id) {
       return res.status(400).json({ erro: "Dados inválidos" });
@@ -40,7 +40,9 @@ export const adicionarCarrinho = async (req, res) => {
     const itemExistente = await prisma.carrinho.findFirst({
       where: {
         usuario_id,
-        produto_id
+        produto_id,
+        tamanho,
+        cor
       }
     });
 
@@ -48,7 +50,7 @@ export const adicionarCarrinho = async (req, res) => {
       const atualizado = await prisma.carrinho.update({
         where: { id: itemExistente.id },
         data: {
-          quantidade: itemExistente.quantidade + 1
+          quantidade: itemExistente.quantidade + quantidade
         }
       });
 
@@ -59,14 +61,16 @@ export const adicionarCarrinho = async (req, res) => {
       data: {
         usuario_id,
         produto_id,
-        quantidade: 1
+        quantidade,
+        tamanho,
+        cor
       }
     });
 
     res.json(novoItem);
 
   } catch (error) {
-    console.error("Erro ao adicionar ao carrinho:", error);
+    console.error(error);
     res.status(500).json({ erro: "Erro ao adicionar ao carrinho" });
   }
 };
@@ -76,20 +80,34 @@ export const adicionarCarrinho = async (req, res) => {
 // =============================
 export const removerCarrinho = async (req, res) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id; // ✅ UUID
+    const usuario_id = req.headers["user-id"];
 
-    if (!id) {
-      return res.status(400).json({ erro: "ID inválido" });
+    if (!id || !usuario_id) {
+      return res.status(400).json({ erro: "Dados inválidos" });
+    }
+
+    // 🔥 GARANTE QUE O ITEM É DO USUÁRIO
+    const item = await prisma.carrinho.findFirst({
+      where: {
+        id,
+        usuario_id
+      }
+    });
+
+    if (!item) {
+      return res.status(404).json({ erro: "Item não encontrado ou não pertence ao usuário" });
     }
 
     await prisma.carrinho.delete({
       where: { id }
     });
 
-    res.json({ mensagem: "Item removido" });
+    res.json({ mensagem: "Item removido com sucesso" });
 
   } catch (error) {
     console.error("Erro ao remover:", error);
+
     res.status(500).json({ erro: "Erro ao remover item" });
   }
 };
